@@ -1,0 +1,15 @@
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { colors, radii, spacing } from '../theme';
+
+export default function VehiclesScreen() {
+  return <SafeAreaView edges={['bottom']} style={styles.safe}><ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <Text style={styles.eyebrow}>GARAGEM</Text><Text style={styles.title}>Seus veículos</Text><Text style={styles.subtitle}>Tenha seus carros sempre à mão na hora de agendar.</Text>
+    <View style={styles.vehicleCard}><View style={styles.carVisual}><Ionicons name="car-sport-outline" size={70} color={colors.primary} /></View><View style={styles.vehicleInfo}><Text style={styles.vehicleName}>Honda Civic</Text><Text style={styles.vehicleDetail}>2022 · Cinza</Text><View style={styles.plate}><Text style={styles.plateText}>ABC 1D23</Text></View></View><Pressable style={styles.more}><Ionicons name="ellipsis-horizontal" size={20} color={colors.muted} /></Pressable></View>
+    <Pressable style={styles.add}><Ionicons name="add" size={20} color={colors.dark} /><Text style={styles.addText}>Adicionar veículo</Text></Pressable>
+    <View style={styles.note}><Ionicons name="information-circle-outline" size={22} color={colors.primary} /><Text style={styles.noteText}>Cadastre mais de um veículo para escolher o carro certo em cada agendamento.</Text></View>
+  </ScrollView></SafeAreaView>;
+}
+const styles = StyleSheet.create({ safe: { flex: 1, backgroundColor: colors.bg }, content: { padding: spacing.lg, gap: spacing.md }, eyebrow: { color: colors.primary, fontSize: 11, fontWeight: '800', letterSpacing: 1.5 }, title: { color: colors.text, fontSize: 30, fontWeight: '800' }, subtitle: { color: colors.muted, fontSize: 14, lineHeight: 20 }, vehicleCard: { backgroundColor: colors.dark, borderRadius: radii.lg, padding: spacing.lg, minHeight: 190, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 8 }, carVisual: { width: 116, height: 116, borderRadius: 58, borderWidth: 1, borderColor: '#5D4C35', alignItems: 'center', justifyContent: 'center' }, vehicleInfo: { flex: 1, gap: 5 }, vehicleName: { color: colors.white, fontSize: 21, fontWeight: '800' }, vehicleDetail: { color: '#B9B4AB', fontSize: 13 }, plate: { alignSelf: 'flex-start', backgroundColor: '#EEE9DF', borderRadius: 5, paddingVertical: 5, paddingHorizontal: 9, marginTop: 6 }, plateText: { color: colors.dark, fontWeight: '800', fontSize: 11, letterSpacing: 1 }, more: { position: 'absolute', top: 18, right: 18 }, add: { borderWidth: 1, borderStyle: 'dashed', borderColor: colors.primary, borderRadius: radii.md, padding: spacing.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }, addText: { color: colors.dark, fontWeight: '800', fontSize: 14 }, note: { backgroundColor: '#FBF3E6', borderRadius: radii.md, padding: spacing.md, flexDirection: 'row', alignItems: 'center', gap: 10 }, noteText: { color: colors.muted, fontSize: 12, lineHeight: 18, flex: 1 } });
