@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { colors, radii, spacing } from '../theme';
+import { colors, radii, spacing } from '../../theme';
 
 const servicos = [
   { nome: 'Lavagem premium', categoria: 'Exterior', descricao: 'Lavagem técnica, secagem cuidadosa e acabamento nos pneus.', preco: 'R$ 89', duracao: '1h', icone: 'water-outline' },

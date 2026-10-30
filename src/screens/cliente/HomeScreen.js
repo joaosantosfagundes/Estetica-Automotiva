@@ -2,8 +2,8 @@ import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth } from '../contexts/AuthContext';
-import { colors, radii, spacing } from '../theme';
+import { useAuth } from '../../contexts/AuthContext';
+import { colors, radii, spacing } from '../../theme';
 
 const servicos = [
   { id: '1', nome: 'Lavagem premium', descricao: 'Brilho impecável por dentro e por fora', preco: 'R$ 89', icone: 'water-outline' },
@@ -87,11 +87,11 @@ const styles = StyleSheet.create({
   heroCopy: { flex: 1, zIndex: 1 },
   heroKicker: { color: colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   heroTitle: { color: colors.white, fontSize: 28, lineHeight: 31, fontWeight: '800', marginTop: 10 },
-  heroText: { color: '#B9B4AB', fontSize: 13, lineHeight: 19, marginTop: 10, maxWidth: 210 },
+  heroText: { color: colors.textOnDarkMuted, fontSize: 13, lineHeight: 19, marginTop: 10, maxWidth: 210 },
   heroButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.primary, borderRadius: radii.pill, paddingVertical: 11, paddingHorizontal: 16, marginTop: 18 },
   heroButtonText: { color: colors.dark, fontWeight: '800', fontSize: 13 },
-  heroShape: { position: 'absolute', right: -24, bottom: -18, width: 170, height: 170, borderRadius: 90, borderWidth: 1, borderColor: '#6D5637', alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-15deg' }] },
-  heroShapeText: { color: '#8B765A', fontSize: 10, lineHeight: 13, letterSpacing: 1.7, fontWeight: '800', textAlign: 'center', marginTop: 6 },
+  heroShape: { position: 'absolute', right: -24, bottom: -18, width: 170, height: 170, borderRadius: 90, borderWidth: 1, borderColor: colors.heroOutline, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-15deg' }] },
+  heroShapeText: { color: colors.heroCaption, fontSize: 10, lineHeight: 13, letterSpacing: 1.7, fontWeight: '800', textAlign: 'center', marginTop: 6 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: -8 },
   sectionTitle: { color: colors.text, fontSize: 19, fontWeight: '800' },
   link: { color: colors.primary, fontSize: 13, fontWeight: '800' },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   serviceName: { color: colors.text, fontSize: 15, fontWeight: '800' },
   serviceDescription: { color: colors.muted, fontSize: 12, lineHeight: 17, minHeight: 34 },
   servicePrice: { color: colors.primary, fontSize: 15, fontWeight: '800', marginTop: 3 },
-  tipCard: { backgroundColor: '#FBF3E6', borderRadius: radii.md, padding: spacing.md, flexDirection: 'row', gap: 12, alignItems: 'center' },
+  tipCard: { backgroundColor: colors.noticeBackground, borderRadius: radii.md, padding: spacing.md, flexDirection: 'row', gap: 12, alignItems: 'center' },
   tipCopy: { flex: 1, gap: 3 },
   tipTitle: { color: colors.text, fontSize: 13, fontWeight: '800' },
   tipText: { color: colors.muted, fontSize: 12 },

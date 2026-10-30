@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import HomeScreen from '../screens/HomeScreen';
-import ServicesScreen from '../screens/ServicesScreen';
-import VehiclesScreen from '../screens/VehiclesScreen';
-import AgendaScreen from '../screens/AgendaScreen';
+import HomeScreen from '../screens/cliente/HomeScreen';
+import ServicesScreen from '../screens/cliente/ServicesScreen';
+import VehiclesScreen from '../screens/cliente/VehiclesScreen';
+import AgendaScreen from '../screens/cliente/AgendaScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../theme';
 
