@@ -74,7 +74,7 @@ docs/             -> modelo-de-dados.md e decisões
 
 users/{uid}: nome, telefone, email, role ("cliente" | "admin")
 vehicles/{id}: userId, marca, modelo, ano, placa, fotoUri
-services/{id}: nome, descricao, preco (number, reais), duracaoMin (number), ativo (boolean)
+services/{id}: nome, descricao, categoria (string), preco (number, reais), duracaoMin (number), ativo (boolean)
 bookings/{id}: userId, vehicleId, serviceId, data ("YYYY-MM-DD"), horaInicio ("HH:mm"), horaFim ("HH:mm"), status ("pendente" | "confirmado" | "cancelado" | "concluido"), criadoEm
 settings/horario: abertura ("HH:mm"), fechamento ("HH:mm"), diasFuncionamento (array de 0 a 6)
 

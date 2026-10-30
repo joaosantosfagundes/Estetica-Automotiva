@@ -1,5 +1,6 @@
 import * as service from '../services/servicoService';
 import { validarNome, validarPreco, validarDuracao } from '../utils/validators';
+import { CATEGORIAS } from '../entities/Servico';
 import AppError from '../utils/AppError';
 
 export function listar(opcoes) { return service.listar(opcoes); }
@@ -12,6 +13,7 @@ export async function salvar(dados, id) {
   if (!validarNome(origem.nome)) campos.nome = 'Informe um nome com pelo menos 3 caracteres.';
   if (!validarPreco(origem.preco)) campos.preco = 'Informe um preço maior que zero, usando vírgula ou ponto nos centavos.';
   if (!validarDuracao(origem.duracaoMin)) campos.duracaoMin = 'A duração deve ser um número inteiro entre 15 e 600 minutos.';
+  if (!CATEGORIAS.includes(origem.categoria)) campos.categoria = 'Selecione uma categoria válida para o serviço.';
   if (Object.keys(campos).length) {
     const erro = new AppError('Revise os campos destacados.', 'validacao/formulario');
     erro.campos = campos;

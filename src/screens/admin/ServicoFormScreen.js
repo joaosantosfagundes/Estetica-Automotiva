@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as servicoController from '../../controllers/servicoController';
+import { CATEGORIAS } from '../../entities/Servico';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
 import { colors, spacing } from '../../theme';
 
-const formularioVazio = { nome: '', descricao: '', preco: '', duracaoMin: '', ativo: true };
+const formularioVazio = { nome: '', descricao: '', categoria: 'Outros', preco: '', duracaoMin: '', ativo: true };
 
 export default function ServicoFormScreen({ route, navigation }) {
   const id = route?.params?.id;
@@ -37,7 +38,7 @@ export default function ServicoFormScreen({ route, navigation }) {
     if (!editando) { setCarregando(false); return () => { ativo = false; }; }
     setCarregando(true);
     servicoController.buscar(id).then(servico => {
-      if (ativo) setFormulario({ nome: servico.nome, descricao: servico.descricao, preco: String(servico.preco).replace('.', ','), duracaoMin: String(servico.duracaoMin), ativo: servico.ativo });
+      if (ativo) setFormulario({ nome: servico.nome, descricao: servico.descricao, categoria: servico.categoria, preco: String(servico.preco).replace('.', ','), duracaoMin: String(servico.duracaoMin), ativo: servico.ativo });
     }).catch(error => {
       if (ativo) setErroCarga(error.message);
     }).finally(() => {
@@ -63,7 +64,7 @@ export default function ServicoFormScreen({ route, navigation }) {
       if (montado.current) navigation.goBack();
     } catch (error) {
       if (!montado.current) return;
-      const campoPorCodigo = { 'validacao/nome': 'nome', 'servico/nome-repetido': 'nome', 'validacao/preco': 'preco', 'validacao/duracaoMin': 'duracaoMin', 'validacao/descricao': 'descricao', 'validacao/ativo': 'ativo' };
+      const campoPorCodigo = { 'validacao/nome': 'nome', 'servico/nome-repetido': 'nome', 'validacao/preco': 'preco', 'validacao/duracaoMin': 'duracaoMin', 'validacao/descricao': 'descricao', 'validacao/ativo': 'ativo', 'validacao/categoria': 'categoria' };
       const campo = campoPorCodigo[error.code];
       if (error.campos) setErrosCampos(error.campos);
       else if (campo) setErrosCampos({ [campo]: error.message });
@@ -94,6 +95,17 @@ export default function ServicoFormScreen({ route, navigation }) {
             <View pointerEvents={salvando ? 'none' : 'auto'} style={styles.fields}>
               <Input label="Nome" value={formulario.nome} onChangeText={valor => alterarCampo('nome', valor)} error={errosCampos.nome} placeholder="Ex.: Lavagem simples" />
               <Input label="Descrição" value={formulario.descricao} onChangeText={valor => alterarCampo('descricao', valor)} error={errosCampos.descricao} placeholder="Descreva o serviço (opcional)" />
+              <View style={styles.categoryField}>
+                <Text style={styles.label}>Categoria</Text>
+                <View style={styles.categoryChips}>
+                  {CATEGORIAS.map(categoria => (
+                    <View key={categoria} style={styles.categoryChip}>
+                      <Button title={categoria} variant={formulario.categoria === categoria ? 'primary' : 'outline'} disabled={salvando} onPress={() => alterarCampo('categoria', categoria)} />
+                    </View>
+                  ))}
+                </View>
+                {errosCampos.categoria ? <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{errosCampos.categoria}</Text> : null}
+              </View>
               <Input label="Preço (R$)" value={formulario.preco} onChangeText={valor => alterarCampo('preco', valor)} error={errosCampos.preco} keyboardType="decimal-pad" placeholder="Ex.: 40,00" />
               <Input label="Duração em minutos" value={formulario.duracaoMin} onChangeText={valor => alterarCampo('duracaoMin', valor)} error={errosCampos.duracaoMin} keyboardType="number-pad" placeholder="Entre 15 e 600" />
               <View style={styles.switchRow}>
@@ -117,6 +129,9 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1, padding: spacing.lg, alignItems: 'center' },
   form: { width: '100%', maxWidth: 600, gap: spacing.md },
   fields: { gap: spacing.md },
+  categoryField: { gap: spacing.sm },
+  categoryChips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  categoryChip: { flexBasis: '30%', flexGrow: 1, minWidth: 100 },
   switchRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm },
   label: { color: colors.text, fontSize: 16, flexShrink: 1 },
   error: { color: colors.danger, fontSize: 14 },

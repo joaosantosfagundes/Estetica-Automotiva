@@ -1,5 +1,5 @@
 import * as repository from '../repositories/servicoRepository';
-import { montarServico } from '../entities/Servico';
+import { CATEGORIAS, montarServico } from '../entities/Servico';
 import AppError from '../utils/AppError';
 
 function traduzirErro(erro) {
@@ -58,6 +58,9 @@ export async function salvar(dados, id) {
     if (!Number.isInteger(origem.duracaoMin) || origem.duracaoMin < 15 || origem.duracaoMin > 600) {
       throw new AppError('A duração deve ser um número inteiro entre 15 e 600 minutos.', 'validacao/duracaoMin');
     }
+    if (!CATEGORIAS.includes(origem.categoria)) {
+      throw new AppError('Selecione uma categoria válida para o serviço.', 'validacao/categoria');
+    }
     if (origem.descricao !== undefined && typeof origem.descricao !== 'string') {
       throw new AppError('Informe uma descrição válida.', 'validacao/descricao');
     }
@@ -74,6 +77,7 @@ export async function salvar(dados, id) {
     const perfil = {
       nome,
       descricao: (origem.descricao ?? '').trim(),
+      categoria: origem.categoria,
       preco: origem.preco,
       duracaoMin: origem.duracaoMin,
       ativo: origem.ativo ?? existente?.ativo ?? true,

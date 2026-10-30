@@ -106,6 +106,7 @@ export default function ServicosAdminScreen({ navigation }) {
             <Card>
               <Pressable accessibilityRole="button" accessibilityLabel={'Editar serviço ' + item.nome} disabled={Boolean(idAlterando)} onPress={() => abrirFormulario(item.id)} style={styles.details}>
                 <Text style={styles.name}>{item.nome}</Text>
+                <Text style={styles.duration}>Categoria: {item.categoria}</Text>
                 <Text style={styles.price}>{formatarMoeda(item.preco)}</Text>
                 <Text style={styles.duration}>Duração: {formatarDuracao(item.duracaoMin)}</Text>
                 <Text style={[styles.badge, item.ativo ? styles.active : styles.inactive]}>{item.ativo ? 'Ativo' : 'Inativo'}</Text>
