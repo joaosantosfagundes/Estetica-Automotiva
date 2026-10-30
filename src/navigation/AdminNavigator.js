@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ServicosAdminScreen from '../screens/admin/ServicosAdminScreen';
+import HorariosAdminScreen from '../screens/admin/HorariosAdminScreen';
 import ServicoFormScreen from '../screens/admin/ServicoFormScreen';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -24,7 +25,7 @@ function ServicosNavigator() {
 const telas = [
   { nome: 'Agenda', icone: 'calendar-outline', componente: makePlaceholder('Agenda') },
   { nome: 'Serviços', icone: 'sparkles-outline', componente: ServicosNavigator },
-  { nome: 'Horários', icone: 'time-outline', componente: makePlaceholder('Horários') },
+  { nome: 'Horários', icone: 'time-outline', componente: HorariosAdminScreen },
   { nome: 'Perfil', icone: 'person-outline', componente: ProfileScreen },
 ];
 

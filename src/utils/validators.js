@@ -32,3 +32,7 @@ export function validarDuracao(valor) {
   const numero = Number(valor);
   return Number.isInteger(numero) && numero >= 15 && numero <= 600;
 }
+
+export function validarHora(valor) {
+  return typeof valor === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(valor);
+}
