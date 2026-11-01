@@ -1,18 +1,37 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import * as servicoController from '../../controllers/servicoController';
+import { formatarMoeda } from '../../utils/formatters';
+import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
+import Button from '../../components/Button';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, radii, spacing } from '../../theme';
 
-const servicos = [
-  { id: '1', nome: 'Lavagem premium', descricao: 'Brilho impecável por dentro e por fora', preco: 'R$ 89', icone: 'water-outline' },
-  { id: '2', nome: 'Polimento técnico', descricao: 'Recupere a profundidade da pintura', preco: 'R$ 249', icone: 'sparkles-outline' },
-  { id: '3', nome: 'Higienização interna', descricao: 'Cuidado profundo para cada detalhe', preco: 'R$ 169', icone: 'leaf-outline' },
-];
+const iconesPorCategoria = { Exterior: 'water-outline', Pintura: 'sparkles-outline', Interior: 'leaf-outline', Proteção: 'shield-checkmark-outline', Outros: 'car-outline' };
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
+  const [servicos, setServicos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
+  const [tentativa, setTentativa] = useState(0);
+  useFocusEffect(useCallback(() => {
+    let ativo = true;
+    setLoading(true);
+    setErro('');
+    servicoController.listar({ apenasAtivos: true }).then(dados => {
+      if (ativo) setServicos(dados.slice(0, 3));
+    }).catch(error => {
+      if (ativo) setErro(error.message);
+    }).finally(() => {
+      if (ativo) setLoading(false);
+    });
+    return () => { ativo = false; };
+  }, [tentativa]));
   const primeiroNome = user?.nome?.split(' ')[0] || 'cliente';
   return (
     <SafeAreaView edges={['bottom']} style={styles.safe}>
@@ -44,6 +63,7 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
+        {/* TODO: ligar próximo cuidado, veículo e demais dados de exemplo ao banco em tarefas futuras. */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Próximo cuidado</Text>
           <Pressable onPress={() => navigation.navigate('Agenda')}><Text style={styles.link}>Ver agenda</Text></Pressable>
@@ -58,16 +78,19 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.sectionTitle}>Escolha seu cuidado</Text>
           <Pressable onPress={() => navigation.navigate('Serviços')}><Text style={styles.link}>Ver todos</Text></Pressable>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.serviceRow}>
+        {loading ? <Loading message="Carregando destaques…" /> : erro ? <View style={styles.feedback}>
+          <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{erro}</Text>
+          <Button title="Tentar novamente" variant="outline" onPress={() => setTentativa(valor => valor + 1)} />
+        </View> : servicos.length === 0 ? <EmptyState title="Nenhum serviço disponível" description="Novos cuidados aparecerão aqui em breve." /> : <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.serviceRow}>
           {servicos.map(servico => (
-            <Pressable key={servico.id} style={styles.serviceCard} onPress={() => navigation.navigate('Serviços')}>
-              <View style={styles.serviceIcon}><Ionicons name={servico.icone} size={22} color={colors.primary} /></View>
+            <Pressable key={servico.id} accessibilityRole="button" accessibilityLabel={'Ver detalhes de ' + servico.nome} style={styles.serviceCard} onPress={() => navigation.navigate('ServiceDetail', { id: servico.id })}>
+              <View style={styles.serviceIcon}><Ionicons name={iconesPorCategoria[servico.categoria] || iconesPorCategoria.Outros} size={22} color={colors.primary} /></View>
               <Text style={styles.serviceName}>{servico.nome}</Text>
-              <Text style={styles.serviceDescription}>{servico.descricao}</Text>
-              <Text style={styles.servicePrice}>{servico.preco}</Text>
+              <Text numberOfLines={2} style={styles.serviceDescription}>{servico.descricao}</Text>
+              <Text style={styles.servicePrice}>{formatarMoeda(servico.preco)}</Text>
             </Pressable>
           ))}
-        </ScrollView>
+        </ScrollView>}
 
         <View style={styles.tipCard}><Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} /><View style={styles.tipCopy}><Text style={styles.tipTitle}>Seu carro em boas mãos</Text><Text style={styles.tipText}>Produtos profissionais e atenção em cada detalhe.</Text></View></View>
       </ScrollView>
@@ -76,6 +99,8 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  feedback: { gap: spacing.sm },
+  error: { color: colors.danger, fontSize: 14 },
   safe: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing.lg, paddingTop: spacing.md, gap: spacing.lg },
   topbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

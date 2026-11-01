@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ServiceDetailScreen from '../screens/cliente/ServiceDetailScreen';
+import { makePlaceholder } from '../components/Placeholder';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import HomeScreen from '../screens/cliente/HomeScreen';
 import ServicesScreen from '../screens/cliente/ServicesScreen';
@@ -10,6 +13,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../theme';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+const BookScreen = makePlaceholder('Agendar');
 const telas = [
   { nome: 'Início', icone: 'home-outline', ativo: 'home', componente: HomeScreen },
   { nome: 'Serviços', icone: 'sparkles-outline', ativo: 'sparkles', componente: ServicesScreen },
@@ -18,7 +23,7 @@ const telas = [
   { nome: 'Perfil', icone: 'person-outline', ativo: 'person', componente: ProfileScreen },
 ];
 
-export default function ClientNavigator() {
+function ClientTabs() {
   return (
     <Tab.Navigator screenOptions={{
       headerShown: false,
@@ -37,7 +42,18 @@ export default function ClientNavigator() {
   );
 }
 
+export default function ClientNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerStyle: styles.header, headerTintColor: colors.text, contentStyle: styles.scene }}>
+      <Stack.Screen name="ClientTabs" component={ClientTabs} options={{ headerShown: false }} />
+      <Stack.Screen name="ServiceDetail" component={ServiceDetailScreen} options={{ title: 'Detalhes do serviço' }} />
+      <Stack.Screen name="Book" component={BookScreen} options={{ title: 'Agendar' }} />
+    </Stack.Navigator>
+  );
+}
+
 const styles = StyleSheet.create({
+  header: { backgroundColor: colors.bg },
   scene: { backgroundColor: colors.bg },
   tabBar: { height: 72, paddingTop: 8, paddingBottom: 10, backgroundColor: colors.card, borderTopColor: colors.border, borderTopWidth: 1, elevation: 0 },
   tabLabel: { fontSize: 10, fontWeight: '700' },
