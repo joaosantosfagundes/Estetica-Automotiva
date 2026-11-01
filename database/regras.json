@@ -1,0 +1,130 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth !== null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth !== null && auth.uid === $uid && newData.exists() && ((!data.exists() && newData.child('role').val() === 'cliente') || (data.exists() && newData.child('role').val() === data.child('role').val()))",
+        ".validate": "newData.hasChildren(['nome', 'telefone', 'email', 'role'])",
+        "nome": {
+          ".validate": "newData.isString()"
+        },
+        "telefone": {
+          ".validate": "newData.isString()"
+        },
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        "role": {
+          ".validate": "newData.isString() && (newData.val() === 'cliente' || newData.val() === 'admin')"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "services": {
+      ".read": "auth !== null",
+      "$id": {
+        ".write": "auth !== null && root.child('users').child(auth.uid).child('role').val() === 'admin' && newData.exists()",
+        ".validate": "newData.hasChildren(['nome', 'preco', 'duracaoMin', 'ativo']) && (newData.hasChild('categoria') || (data.exists() && !data.hasChild('categoria')))",
+        "nome": {
+          ".validate": "newData.isString()"
+        },
+        "descricao": {
+          ".validate": "newData.isString()"
+        },
+        "preco": {
+          ".validate": "newData.isNumber() && newData.val() > 0"
+        },
+        "duracaoMin": {
+          ".validate": "newData.isNumber()"
+        },
+        "ativo": {
+          ".validate": "newData.isBoolean()"
+        },
+        "categoria": {
+          ".validate": "newData.isString()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "settings": {
+      ".read": "auth !== null",
+      ".write": "auth !== null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "vehicles": {
+      ".indexOn": [
+        "userId"
+      ],
+      ".read": "auth !== null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (query.orderByChild === 'userId' && query.equalTo === auth.uid))",
+      "$id": {
+        ".write": "auth !== null && ((!data.exists() && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('userId').val() === auth.uid && (!newData.exists() || newData.child('userId').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['userId', 'marca', 'modelo', 'placa', 'ano'])",
+        "userId": {
+          ".validate": "newData.isString()"
+        },
+        "marca": {
+          ".validate": "newData.isString()"
+        },
+        "modelo": {
+          ".validate": "newData.isString()"
+        },
+        "placa": {
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z]{3}-?[0-9][A-Za-z0-9][0-9]{2}$/)"
+        },
+        "ano": {
+          ".validate": "(newData.isNumber() && newData.val() >= 1000 && newData.val() <= 9999 && newData.val() % 1 === 0) || (newData.isString() && newData.val().matches(/^[0-9]{4}$/))"
+        },
+        "fotoUri": {
+          ".validate": "newData.isString()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "bookings": {
+      ".indexOn": [
+        "data",
+        "userId"
+      ],
+      ".read": "auth !== null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (query.orderByChild === 'data' && query.equalTo !== null) || (query.orderByChild === 'userId' && query.equalTo === auth.uid))",
+      "$id": {
+        ".write": "auth !== null && newData.exists() && ((!data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'pendente') || (data.exists() && root.child('users').child(auth.uid).child('role').val() === 'admin'))",
+        ".validate": "newData.hasChildren(['userId', 'vehicleId', 'serviceId', 'data', 'horaInicio', 'horaFim', 'status'])",
+        "userId": {
+          ".validate": "newData.isString()"
+        },
+        "vehicleId": {
+          ".validate": "newData.isString()"
+        },
+        "serviceId": {
+          ".validate": "newData.isString()"
+        },
+        "data": {
+          ".validate": "newData.isString() && newData.val().matches(/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/)"
+        },
+        "horaInicio": {
+          ".validate": "newData.isString() && newData.val().matches(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)"
+        },
+        "horaFim": {
+          ".validate": "newData.isString() && newData.val().matches(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)"
+        },
+        "status": {
+          ".write": "auth !== null && data.parent().exists() && data.parent().child('userId').val() === auth.uid && newData.val() === 'cancelado'",
+          ".validate": "newData.isString() && (newData.val() === 'pendente' || newData.val() === 'confirmado' || newData.val() === 'cancelado' || newData.val() === 'concluido')"
+        },
+        "criadoEm": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
