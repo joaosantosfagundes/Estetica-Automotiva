@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import VeiculoFormScreen from '../screens/cliente/VeiculoFormScreen';
 import ServiceDetailScreen from '../screens/cliente/ServiceDetailScreen';
 import { makePlaceholder } from '../components/Placeholder';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -47,6 +48,7 @@ export default function ClientNavigator() {
     <Stack.Navigator screenOptions={{ headerStyle: styles.header, headerTintColor: colors.text, contentStyle: styles.scene }}>
       <Stack.Screen name="ClientTabs" component={ClientTabs} options={{ headerShown: false }} />
       <Stack.Screen name="ServiceDetail" component={ServiceDetailScreen} options={{ title: 'Detalhes do serviço' }} />
+      <Stack.Screen name="AddVehicle" component={VeiculoFormScreen} options={{ title: 'Adicionar veículo' }} />
       <Stack.Screen name="Book" component={BookScreen} options={{ title: 'Agendar' }} />
     </Stack.Navigator>
   );
