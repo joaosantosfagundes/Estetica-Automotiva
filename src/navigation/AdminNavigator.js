@@ -5,13 +5,23 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ServicosAdminScreen from '../screens/admin/ServicosAdminScreen';
 import HorariosAdminScreen from '../screens/admin/HorariosAdminScreen';
 import ServicoFormScreen from '../screens/admin/ServicoFormScreen';
+import AgendaAdminScreen from '../screens/admin/AgendaAdminScreen';
+import AgendamentoDetalheScreen from '../screens/admin/AgendamentoDetalheScreen';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ProfileScreen from '../screens/ProfileScreen';
-import { makePlaceholder } from '../components/Placeholder';
 import { colors } from '../theme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+
+function AgendaNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerStyle: styles.header, headerTintColor: colors.card, contentStyle: styles.scene }}>
+      <Stack.Screen name="AgendaLista" component={AgendaAdminScreen} options={{ title: 'Agenda' }} />
+      <Stack.Screen name="BookingDetail" component={AgendamentoDetalheScreen} options={{ title: 'Detalhes do agendamento' }} />
+    </Stack.Navigator>
+  );
+}
 
 function ServicosNavigator() {
   return (
@@ -23,7 +33,7 @@ function ServicosNavigator() {
 }
 
 const telas = [
-  { nome: 'Agenda', icone: 'calendar-outline', componente: makePlaceholder('Agenda') },
+  { nome: 'Agenda', icone: 'calendar-outline', componente: AgendaNavigator },
   { nome: 'Serviços', icone: 'sparkles-outline', componente: ServicosNavigator },
   { nome: 'Horários', icone: 'time-outline', componente: HorariosAdminScreen },
   { nome: 'Perfil', icone: 'person-outline', componente: ProfileScreen },
@@ -42,7 +52,7 @@ export default function AdminNavigator() {
     }}>
       {telas.map(tela => (
         <Tab.Screen key={tela.nome} name={tela.nome} component={tela.componente}
-          options={{ headerShown: tela.nome !== 'Serviços', tabBarIcon: ({ color, size }) => <Ionicons name={tela.icone} color={color} size={size} /> }} />
+          options={{ headerShown: !['Agenda', 'Serviços'].includes(tela.nome), tabBarIcon: ({ color, size }) => <Ionicons name={tela.icone} color={color} size={size} /> }} />
       ))}
     </Tab.Navigator>
   );
