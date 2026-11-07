@@ -25,7 +25,7 @@ export default function Select({ label, value, options = [], onSelect, error, pl
       {error ? <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{error}</Text> : null}
       <Modal visible={aberto} transparent animationType="slide" onRequestClose={fechar}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.modal}>
-          <Pressable accessibilityLabel="Fechar seleção" style={styles.backdrop} onPress={fechar} />
+          <Pressable accessibilityRole="button" accessibilityLabel="Fechar seleção" style={styles.backdrop} onPress={fechar} />
           <SafeAreaView edges={['bottom']} accessibilityViewIsModal style={styles.panel}>
             <Text accessibilityRole="header" style={styles.title}>{label || 'Selecione uma opção'}</Text>
             {searchable ? <Input label="Buscar" value={busca} onChangeText={setBusca} placeholder="Digite para buscar" /> : null}
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   input: { minHeight: 48, borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: spacing.md, backgroundColor: colors.card, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   value: { flex: 1, color: colors.text, fontSize: 16 }, placeholder: { color: colors.muted }, invalid: { borderColor: colors.danger }, error: { color: colors.danger, fontSize: 14 },
   modal: { flex: 1, justifyContent: 'flex-end' }, backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: colors.dark, opacity: 0.45 },
-  panel: { width: '100%', maxWidth: 720, alignSelf: 'center', maxHeight: '85%', minHeight: 280, padding: spacing.md, gap: spacing.md, backgroundColor: colors.card, borderTopLeftRadius: radii.lg, borderTopRightRadius: radii.lg },
+  panel: { width: '100%', maxWidth: 720, alignSelf: 'center', maxHeight: '85%', padding: spacing.md, gap: spacing.md, backgroundColor: colors.card, borderTopLeftRadius: radii.lg, borderTopRightRadius: radii.lg },
   title: { color: colors.text, fontSize: 20, fontWeight: '700' }, options: { flexGrow: 0, flexShrink: 1 },
   option: { minHeight: 48, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border }, optionText: { color: colors.text, fontSize: 16 },
 });

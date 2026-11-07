@@ -56,6 +56,6 @@ export default function ClientNavigator() {
 const styles = StyleSheet.create({
   header: { backgroundColor: colors.bg },
   scene: { backgroundColor: colors.bg },
-  tabBar: { height: 72, paddingTop: 8, paddingBottom: 10, backgroundColor: colors.card, borderTopColor: colors.border, borderTopWidth: 1, elevation: 0 },
+  tabBar: { backgroundColor: colors.card, borderTopColor: colors.border, borderTopWidth: 1, elevation: 0 },
   tabLabel: { fontSize: 10, fontWeight: '700' },
 });

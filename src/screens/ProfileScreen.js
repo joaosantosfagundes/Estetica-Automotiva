@@ -24,7 +24,7 @@ export default function ProfileScreen() {
   }
   if (!user) return <EmptyState title="Perfil indisponível" description="Entre novamente para ver seu perfil." />;
   return (
-    <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.safe}>
+    <SafeAreaView edges={user.role === ROLES.ADMIN ? ['left', 'right'] : ['top', 'left', 'right']} style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.form}>
           <Card>

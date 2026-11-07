@@ -14,8 +14,8 @@ export default function Button({ title, onPress, variant = 'primary', loading = 
       onPress={onPress}
       style={({ pressed }) => [styles.base, styles[tipo], bloqueado && styles.disabled, pressed && styles.pressed]}
     >
-      {loading ? <ActivityIndicator color={tipo === 'outline' ? colors.primary : colors.card} /> : null}
-      <Text style={[styles.title, tipo === 'outline' && styles.outlineTitle]}>{title}</Text>
+      {loading ? <ActivityIndicator color={tipo === 'danger' ? colors.card : colors.text} /> : null}
+      <Text style={[styles.title, tipo === 'danger' && styles.dangerTitle]}>{title}</Text>
     </Pressable>
   );
 }
@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
   primary: { backgroundColor: colors.primary, borderColor: colors.primary },
   outline: { backgroundColor: colors.card, borderColor: colors.primary },
   danger: { backgroundColor: colors.danger, borderColor: colors.danger },
-  title: { color: colors.card, fontSize: 16, fontWeight: '600', textAlign: 'center', flexShrink: 1 },
-  outlineTitle: { color: colors.primary },
+  title: { color: colors.text, fontSize: 16, fontWeight: '600', textAlign: 'center', flexShrink: 1 },
+  dangerTitle: { color: colors.card },
   disabled: { opacity: 0.5 },
   pressed: { opacity: 0.8 },
 });

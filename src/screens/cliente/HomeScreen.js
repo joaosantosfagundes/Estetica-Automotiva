@@ -8,7 +8,7 @@ import { formatarDataPorExtenso, formatarMoeda, formatarPlaca } from '../../util
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
 import Button from '../../components/Button';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -19,6 +19,7 @@ const mesesAbreviados = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO',
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
+  const { width, fontScale } = useWindowDimensions();
   const [dados, setDados] = useState({ servicos: [], proximo: null, veiculo: null });
   const [loading, setLoading] = useState({ servicos: true, proximo: true, veiculo: true });
   const [erro, setErro] = useState({});
@@ -51,7 +52,7 @@ export default function HomeScreen({ navigation }) {
   const primeiroNome = user?.nome?.split(' ')[0] || 'cliente';
   const { proximo, veiculo, servicos } = dados;
   return (
-    <SafeAreaView edges={['bottom']} style={styles.safe}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topbar}>
           <View style={styles.headerCopy}>
@@ -68,15 +69,15 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.heroKicker}>SEU CARRO, DO SEU JEITO</Text>
             <Text style={styles.heroTitle}>Cuidado que{`\n`}você percebe.</Text>
             <Text style={styles.heroText}>Agende seu próximo momento de brilho em poucos toques.</Text>
-            <Pressable style={styles.heroButton} onPress={() => navigation.navigate('Serviços')}>
+            <Pressable accessibilityRole="button" style={styles.heroButton} onPress={() => navigation.navigate('Serviços')}>
               <Text style={styles.heroButtonText}>Ver serviços</Text>
               <Ionicons name="arrow-forward" size={17} color={colors.dark} />
             </Pressable>
           </View>
-          <View style={styles.heroShape}>
+          {width > 360 && fontScale <= 1.2 ? <View style={styles.heroShape}>
             <Ionicons name="car-sport-outline" size={72} color={colors.primary} />
             <Text style={styles.heroShapeText}>BRILHO{`\n`}AUTÊNTICO</Text>
-          </View>
+          </View> : null}
         </View>
 
         <View style={styles.sectionHeader}>
@@ -156,12 +157,12 @@ const styles = StyleSheet.create({
   heroKicker: { color: colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   heroTitle: { color: colors.white, fontSize: 28, lineHeight: 31, fontWeight: '800', marginTop: 10 },
   heroText: { color: colors.textOnDarkMuted, fontSize: 13, lineHeight: 19, marginTop: 10, maxWidth: 210 },
-  heroButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.primary, borderRadius: radii.pill, paddingVertical: 11, paddingHorizontal: 16, marginTop: 18 },
-  heroButtonText: { color: colors.dark, fontWeight: '800', fontSize: 13 },
+  heroButton: { alignSelf: 'flex-start', minHeight: 44, maxWidth: '100%', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.primary, borderRadius: radii.pill, paddingVertical: 11, paddingHorizontal: 16, marginTop: 18 },
+  heroButtonText: { color: colors.dark, fontWeight: '800', fontSize: 13, flexShrink: 1 },
   heroShape: { position: 'absolute', right: -24, bottom: -18, width: 170, height: 170, borderRadius: 90, borderWidth: 1, borderColor: colors.heroOutline, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-15deg' }] },
   heroShapeText: { color: colors.heroCaption, fontSize: 10, lineHeight: 13, letterSpacing: 1.7, fontWeight: '800', textAlign: 'center', marginTop: 6 },
   sectionHeader: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm, marginBottom: -8 },
-  sectionLink: { minHeight: 44, justifyContent: 'center' },
+  sectionLink: { minHeight: 44, minWidth: 44, justifyContent: 'center' },
   sectionTitle: { color: colors.text, fontSize: 19, fontWeight: '800' },
   link: { color: colors.primary, fontSize: 13, fontWeight: '800' },
   bookingCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, padding: spacing.md, flexDirection: 'row', alignItems: 'center', gap: spacing.md },
