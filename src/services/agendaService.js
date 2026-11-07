@@ -1,8 +1,10 @@
 import * as agendamentoRepository from '../repositories/agendamentoRepository';
+import * as financeiroRepository from '../repositories/financeiroRepository';
 import * as servicoRepository from '../repositories/servicoRepository';
 import * as usuarioRepository from '../repositories/usuarioRepository';
 import * as veiculoRepository from '../repositories/veiculoRepository';
 import { STATUS } from '../entities/Agendamento';
+import { valorCentavosValido } from '../entities/EntradaFinanceira';
 import AppError from '../utils/AppError';
 
 const transicoes = {
@@ -74,7 +76,7 @@ export async function listarDoDia(data) {
   } catch (erro) { throw traduzirErro(erro); }
 }
 
-export async function alterarStatus(id, novoStatus) {
+export async function alterarStatus(id, novoStatus, valorCentavos) {
   try {
     const chave = conferirId(id);
     if (!Object.values(STATUS).includes(novoStatus)) {
@@ -87,7 +89,16 @@ export async function alterarStatus(id, novoStatus) {
     if (!transicoes[agendamento.status]?.includes(novoStatus)) {
       throw new AppError('Não é possível alterar este agendamento para o status escolhido. Atualize a agenda.', 'agendamento/transicao-invalida');
     }
-    await agendamentoRepository.atualizarStatus(chave, novoStatus);
+    if (novoStatus === STATUS.CONCLUIDO) {
+      if (!valorCentavosValido(valorCentavos)) {
+        throw new AppError('Informe um valor recebido válido para concluir o atendimento.', 'financeiro/valor-invalido');
+      }
+      const servico = await servicoRepository.buscarPorId(agendamento.serviceId);
+      const servicoNome = servico?.nome?.trim() || 'Serviço sem nome';
+      await financeiroRepository.registrarConclusao(chave, { valorCentavos, servicoNome });
+    } else {
+      await agendamentoRepository.atualizarStatus(chave, novoStatus);
+    }
     return { ...agendamento, status: novoStatus };
   } catch (erro) { throw traduzirErro(erro); }
 }

@@ -8,6 +8,7 @@ import { formatarData, formatarMoeda, formatarPlaca, formatarTelefone } from '..
 import AppError from '../../utils/AppError';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import Input from '../../components/Input';
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
 import { colors, radii, spacing } from '../../theme';
@@ -36,6 +37,8 @@ export default function AgendamentoDetalheScreen({ route, navigation }) {
   const [erro, setErro] = useState('');
   const [erroAcao, setErroAcao] = useState('');
   const [executando, setExecutando] = useState(null);
+  const [valorRecebido, setValorRecebido] = useState(null);
+  const [erroValor, setErroValor] = useState('');
   const requisicao = useRef(0);
   const emFoco = useRef(false);
   const montado = useRef(true);
@@ -50,6 +53,7 @@ export default function AgendamentoDetalheScreen({ route, navigation }) {
   const carregar = useCallback(async () => {
     const atual = ++requisicao.current;
     setLoading(true); setErro(''); setErroAcao(''); setAgendamento(null);
+    setValorRecebido(null); setErroValor('');
     try {
       if (typeof id !== 'string' || !id.trim()) throw new AppError('O agendamento informado é inválido.', 'agendamento/id-invalido');
       const lista = await agendaController.listarDoDia(data);
@@ -67,15 +71,18 @@ export default function AgendamentoDetalheScreen({ route, navigation }) {
     return () => { emFoco.current = false; confirmando.current = false; ++requisicao.current; };
   }, [carregar]));
 
-  async function alterar(acao) {
+  async function alterar(status, valor) {
     if (!emFoco.current || alterando.current) return;
     alterando.current = true;
-    setExecutando(acao.status); setErroAcao('');
+    setExecutando(status); setErroAcao(''); setErroValor('');
     try {
-      await agendaController.alterarStatus(id, acao.status);
+      await agendaController.alterarStatus(id, status, valor);
       if (emFoco.current) navigation.goBack();
     } catch (error) {
-      if (emFoco.current) setErroAcao(error.message);
+      if (emFoco.current) {
+        if (error.campos?.valorRecebido) setErroValor(error.campos.valorRecebido);
+        else setErroAcao(error.message);
+      }
     } finally {
       alterando.current = false;
       if (montado.current) setExecutando(null);
@@ -84,10 +91,16 @@ export default function AgendamentoDetalheScreen({ route, navigation }) {
 
   function confirmar(acao) {
     if (alterando.current || confirmando.current) return;
+    if (acao.status === STATUS.CONCLUIDO) {
+      const preco = agendamento.servico?.preco;
+      setValorRecebido(Number.isFinite(preco) ? preco.toFixed(2).replace('.', ',') : '');
+      setErroAcao(''); setErroValor('');
+      return;
+    }
     confirmando.current = true;
     Alert.alert(acao.pergunta, 'O status será atualizado na agenda da estética e na conta do cliente.', [
       { text: 'Voltar', style: 'cancel', onPress: () => { confirmando.current = false; } },
-      { text: acao.titulo, style: acao.perigo ? 'destructive' : 'default', onPress: () => { confirmando.current = false; alterar(acao); } },
+      { text: acao.titulo, style: acao.perigo ? 'destructive' : 'default', onPress: () => { confirmando.current = false; alterar(acao.status); } },
     ], { cancelable: true, onDismiss: () => { confirmando.current = false; } });
   }
 
@@ -105,7 +118,7 @@ export default function AgendamentoDetalheScreen({ route, navigation }) {
   const estiloStatus = { [STATUS.PENDENTE]: styles.pending, [STATUS.CONFIRMADO]: styles.confirmed, [STATUS.CANCELADO]: styles.canceled, [STATUS.CONCLUIDO]: styles.completed }[status] || styles.completed;
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled">
         <View style={styles.section}>
           <Text accessibilityRole="header" style={styles.title}>{servico?.nome || 'Serviço não encontrado'}</Text>
           <Text style={[styles.badge, estiloStatus]}>{STATUS_ROTULOS[status] || 'Status não informado'}</Text>
@@ -140,10 +153,21 @@ export default function AgendamentoDetalheScreen({ route, navigation }) {
             <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{erroAcao}</Text>
             <Button title="Atualizar agendamento" variant="outline" disabled={Boolean(executando)} onPress={carregar} />
           </View> : null}
-          <View style={styles.actions}>
+          {status === STATUS.CONFIRMADO && valorRecebido !== null ? <Card>
+            <Text accessibilityRole="header" style={styles.mainText}>Concluir atendimento</Text>
+            <Text style={styles.secondary}>Confirme quanto recebeu pelo serviço para registrar a entrada.</Text>
+            <View pointerEvents={executando ? 'none' : 'auto'}>
+              <Input label="Valor recebido (R$)" value={valorRecebido} keyboardType="decimal-pad" placeholder="0,00"
+                onChangeText={texto => { setValorRecebido(texto); setErroValor(''); }} error={erroValor} />
+            </View>
+            <Button title="Concluir e registrar" loading={executando === STATUS.CONCLUIDO} disabled={Boolean(executando)}
+              onPress={() => alterar(STATUS.CONCLUIDO, valorRecebido)} />
+            <Button title="Voltar" variant="outline" disabled={Boolean(executando)}
+              onPress={() => { setValorRecebido(null); setErroValor(''); setErroAcao(''); }} />
+          </Card> : <View style={styles.actions}>
             {(acoesPorStatus[status] || []).map(acao => <Button key={acao.titulo} title={acao.titulo} variant={acao.perigo ? 'danger' : 'primary'}
               loading={executando === acao.status} disabled={Boolean(executando)} onPress={() => confirmar(acao)} />)}
-          </View>
+          </View>}
         </View>
       </ScrollView>
     </SafeAreaView>

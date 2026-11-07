@@ -115,11 +115,31 @@
           ".validate": "newData.isString() && newData.val().matches(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)"
         },
         "status": {
-          ".write": "auth !== null && data.parent().exists() && data.parent().child('userId').val() === auth.uid && newData.val() === 'cancelado'",
-          ".validate": "newData.isString() && (newData.val() === 'pendente' || newData.val() === 'confirmado' || newData.val() === 'cancelado' || newData.val() === 'concluido')"
+          ".write": "auth !== null && data.parent().child('userId').val() === auth.uid && (data.val() === 'pendente' || data.val() === 'confirmado') && newData.val() === 'cancelado'",
+          ".validate": "newData.isString() && (newData.val() === 'pendente' || newData.val() === 'confirmado' || newData.val() === 'cancelado' || newData.val() === 'concluido') && (!root.child('receipts').child($id).exists() || newData.val() === 'concluido')"
         },
         "criadoEm": {
           ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "receipts": {
+      ".read": "auth !== null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["recebidoEm"],
+      "$id": {
+        ".write": "auth !== null && root.child('users').child(auth.uid).child('role').val() === 'admin' && !data.exists() && newData.exists() && root.child('bookings').child($id).child('status').val() === 'confirmado' && newData.parent().parent().child('bookings').child($id).child('status').val() === 'concluido'",
+        ".validate": "newData.hasChildren(['valorCentavos', 'recebidoEm', 'servicoNome'])",
+        "valorCentavos": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999999 && newData.val() % 1 === 0"
+        },
+        "recebidoEm": {
+          ".validate": "newData.isNumber() && newData.val() === now"
+        },
+        "servicoNome": {
+          ".validate": "newData.isString() && newData.val().length > 0"
         },
         "$other": {
           ".validate": false

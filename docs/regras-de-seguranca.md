@@ -9,7 +9,8 @@ O arquivo a publicar é [database/regras.json](../database/regras.json). Esta ta
 - **services:** autenticados leem; somente admin grava. Nome é string, preço é número positivo, duração é número, ativo é boolean e categoria é string. Descrição, se presente, é string. Novos serviços exigem categoria; serviços legados sem categoria podem ser inativados e passam a ter categoria ao serem editados. Uma categoria existente não pode ser apagada. Exclusão definitiva do serviço é negada; use ativo = false.
 - **settings:** autenticados leem e somente admin escreve. Estas regras controlam a permissão; não repetem as validações de horários do service.
 - **vehicles:** clientes leem a coleção somente por consulta userId igual ao próprio UID; admin pode ler tudo. O dono cria, edita e exclui seu veículo, sem transferir userId nem tomar veículo de outro. A exceção de admin é apenas para leitura, conforme solicitado. Marca/modelo são strings; placa aceita padrão antigo ou Mercosul, com caixa indiferente e hífen opcional. Ano aceita inteiro de quatro dígitos ou string com quatro dígitos. fotoUri, se existir, é string.
-- **bookings:** autenticados consultam um dia por data ou os próprios registros por userId; admin lê tudo. A criação exige userId próprio e status pendente, inclusive para admin. O dono atualiza exclusivamente o campo status para cancelado, por escrita nesse campo ou update parcial. Admin pode atualizar registros existentes com qualquer um dos quatro status válidos. Não há exclusão de agendamento. userId, vehicleId e serviceId são strings; data segue YYYY-MM-DD, as horas seguem HH:mm válido e criadoEm, se informado, é timestamp numérico. Campos extras nos registros de users, services, vehicles e bookings são recusados.
+- **bookings** permite que autenticados consultem um dia por data ou os próprios registros por userId. Admin lê tudo. A criação exige userId próprio e status pendente, inclusive para admin. O dono pode cancelar agendamentos pendentes ou confirmados escrevendo apenas no campo status. Admin pode atualizar registros existentes. Agendamentos com entrada financeira permanecem concluídos. O banco recusa exclusão de agendamentos. userId, vehicleId e serviceId são strings, data segue YYYY-MM-DD, as horas seguem HH:mm e criadoEm, quando informado, é um timestamp numérico. Campos extras são recusados.
+- **receipts** registra o valor confirmado pelo admin, em centavos, junto com o nome do serviço e o horário de gravação fornecido pelo Firebase. Apenas admins leem as entradas. Cada `receipts/{id}` é criado uma vez, na mesma operação que conclui `bookings/{id}`. O total mensal usa `recebidoEm`. Atendimentos concluídos antes do Financeiro ficam no histórico da agenda, sem entrada retroativa.
 
 **Importante para quem usar o SDK:** cancelar com update(ref(db, 'bookings/ID'), { status: 'cancelado' }) ou set(ref(db, 'bookings/ID/status'), 'cancelado'). Substituir o objeto inteiro com set(ref(db, 'bookings/ID'), objeto) é negado para o cliente, mesmo que repita os outros campos.
 
@@ -69,7 +70,7 @@ Crie fixtures pelo console em services/s1, vehicles/v1 (userId cli1), vehicles/v
 | adm: set | bookings/b1/status: testar os quatro status válidos | Permitido |
 | adm: set | bookings/b1/status = "outro" | Negado |
 | cli1: set | booking novo com data "02/11/2026" ou horaFim "24:00" | Negado |
-| adm: set | caminho fora das cinco coleções | Negado |
+| adm: set | caminho fora das coleções listadas | Negado |
 
 Exemplos completos para as escritas:
 
@@ -85,7 +86,9 @@ Exemplos completos para as escritas:
 
 Use somente o objeto correspondente como payload no caminho indicado, sem os wrappers perfil/servico/etc. Para consultas, se o painel não oferecer orderByChild/equalTo, use o SDK com o emulador local; um get simples no simulador não equivale a uma consulta. Confira: veículos com userId cli1 permitidos, userId cli2 negados para cli1; bookings por data e por userId próprio permitidos, por userId alheio e sem equalTo negados.
 
-Foram executados 76 cenários no emulador oficial do Realtime Database v4.11.2, incluindo compilação das regras, consultas com autenticação simulada, tipos, alteração conjunta de status/outros campos, exclusão de campos e tentativa atômica de elevar role e gravar serviço. Nenhuma chamada foi feita ao banco de produção. Código do app e dependências do projeto não foram alterados.
+Na etapa A5, foram executados 76 cenários no emulador oficial do Realtime Database v4.11.2, incluindo compilação das regras, consultas com autenticação simulada, tipos, alteração conjunta de status e outros campos, exclusão de campos e tentativa de elevar role e gravar serviço na mesma operação.
+
+Para conferir o Financeiro, confirme um agendamento como admin e use **Concluir e registrar** com um valor em reais. Abra a aba **Financeiro** e confira o total e a entrada no mês. Como cliente, simule a leitura de `receipts` e confirme que ela é negada. A conclusão com entrada usa uma atualização com dois caminhos, que pode ser simulada no emulador com o SDK.
 
 ## Publicar manualmente pelo console
 
@@ -95,5 +98,7 @@ Foram executados 76 cenários no emulador oficial do Realtime Database v4.11.2, 
 4. Antes de publicar, confira os erros de sintaxe no editor e execute os cenários no **Simulador de regras / Rules Playground**, usando os dados e UIDs corretos.
 5. Somente quando os resultados estiverem corretos, clique em **Publicar** e confirme a nova versão. Esta ação será feita por você no console, não pelo Codex.
 6. No app, teste cadastro/login, leitura de serviços e horário, cadastro de serviço como admin e bloqueio da mesma gravação como cliente. As futuras consultas de veículos/agendamentos devem usar os filtros acima.
+
+Publique as regras com `receipts` antes de usar a versão do app com a aba **Financeiro**, pois a conclusão do atendimento passa a gravar essa entrada na mesma operação.
 
 Referências: [condições e consultas](https://firebase.google.com/docs/database/security/rules-conditions), [sintaxe e cascata](https://firebase.google.com/docs/database/security/core-syntax), [API das regras](https://firebase.google.com/docs/reference/security/database).

@@ -7,6 +7,7 @@ import HorariosAdminScreen from '../screens/admin/HorariosAdminScreen';
 import ServicoFormScreen from '../screens/admin/ServicoFormScreen';
 import AgendaAdminScreen from '../screens/admin/AgendaAdminScreen';
 import AgendamentoDetalheScreen from '../screens/admin/AgendamentoDetalheScreen';
+import FinanceiroAdminScreen from '../screens/admin/FinanceiroAdminScreen';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../theme';
@@ -36,6 +37,7 @@ const telas = [
   { nome: 'Agenda', icone: 'calendar-outline', componente: AgendaNavigator },
   { nome: 'Serviços', icone: 'sparkles-outline', componente: ServicosNavigator },
   { nome: 'Horários', icone: 'time-outline', componente: HorariosAdminScreen },
+  { nome: 'Financeiro', icone: 'wallet-outline', componente: FinanceiroAdminScreen },
   { nome: 'Perfil', icone: 'person-outline', componente: ProfileScreen },
 ];
 
