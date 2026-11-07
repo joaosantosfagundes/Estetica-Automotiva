@@ -34,3 +34,14 @@ export function formatarHora(texto) {
   const digitos = String(texto ?? '').replace(/\D/g, '').slice(0, 4);
   return digitos.length <= 2 ? digitos : digitos.slice(0, 2) + ':' + digitos.slice(2);
 }
+
+export function formatarDataPorExtenso(texto) {
+  if (!formatarData(texto)) return '';
+  const [ano, mes, dia] = texto.split('-').map(Number);
+  const data = new Date(0);
+  data.setFullYear(ano, mes - 1, dia);
+  data.setHours(12, 0, 0, 0);
+  const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  return dias[data.getDay()] + ', ' + dia + ' de ' + meses[mes - 1] + ' de ' + ano;
+}
