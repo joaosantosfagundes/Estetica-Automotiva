@@ -5,7 +5,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../../contexts/AuthContext';
 import * as veiculoController from '../../controllers/veiculoController';
 import { formatarPlaca } from '../../utils/formatters';
-import AppError from '../../utils/AppError';
 import Select from '../../components/Select';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -80,15 +79,10 @@ export default function VeiculoFormScreen({ navigation }) {
     bloqueio.current = true; setSelecionandoFoto(true);
     setCampos(atual => ({ ...atual, fotoUri: undefined }));
     try {
-      if (Platform.OS !== 'web') {
-        const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (!permissao.granted) throw new AppError('Acesso às fotos não permitido. Você pode salvar sem foto ou autorizar o acesso nas configurações.', 'foto/permissao');
-      }
-      const resultado = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8 });
+      const resultado = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: false, quality: 0.8 });
       if (montado.current && !resultado.canceled && resultado.assets?.[0]?.uri) setFotoUri(resultado.assets[0].uri);
-    } catch (error) {
-      const falha = error instanceof AppError ? error : new AppError('Não foi possível selecionar a foto. Tente novamente ou salve sem foto.', 'foto/falha');
-      if (montado.current) setCampos(atual => ({ ...atual, fotoUri: falha.message }));
+    } catch {
+      if (montado.current) setCampos(atual => ({ ...atual, fotoUri: 'Não foi possível selecionar a foto. Tente novamente ou salve sem foto.' }));
     } finally { bloqueio.current = false; if (montado.current) setSelecionandoFoto(false); }
   }
   async function salvar() {
