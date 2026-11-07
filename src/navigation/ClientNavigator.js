@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import VeiculoFormScreen from '../screens/cliente/VeiculoFormScreen';
 import ServiceDetailScreen from '../screens/cliente/ServiceDetailScreen';
-import { makePlaceholder } from '../components/Placeholder';
+import AgendarScreen from '../screens/cliente/AgendarScreen';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import HomeScreen from '../screens/cliente/HomeScreen';
 import ServicesScreen from '../screens/cliente/ServicesScreen';
@@ -15,7 +15,6 @@ import { colors } from '../theme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-const BookScreen = makePlaceholder('Agendar');
 const telas = [
   { nome: 'Início', icone: 'home-outline', ativo: 'home', componente: HomeScreen },
   { nome: 'Serviços', icone: 'sparkles-outline', ativo: 'sparkles', componente: ServicesScreen },
@@ -49,7 +48,7 @@ export default function ClientNavigator() {
       <Stack.Screen name="ClientTabs" component={ClientTabs} options={{ headerShown: false }} />
       <Stack.Screen name="ServiceDetail" component={ServiceDetailScreen} options={{ title: 'Detalhes do serviço' }} />
       <Stack.Screen name="AddVehicle" component={VeiculoFormScreen} options={{ title: 'Adicionar veículo' }} />
-      <Stack.Screen name="Book" component={BookScreen} options={{ title: 'Agendar' }} />
+      <Stack.Screen name="Book" component={AgendarScreen} options={{ title: 'Agendar' }} />
     </Stack.Navigator>
   );
 }
