@@ -110,7 +110,7 @@ export default function ServicoFormScreen({ route, navigation }) {
               <Input label="Duração em minutos" value={formulario.duracaoMin} onChangeText={valor => alterarCampo('duracaoMin', valor)} error={errosCampos.duracaoMin} keyboardType="number-pad" placeholder="Entre 15 e 600" />
               <View style={styles.switchRow}>
                 <Text style={styles.label}>Serviço ativo</Text>
-                <Switch accessibilityLabel="Serviço ativo" value={formulario.ativo} onValueChange={valor => alterarCampo('ativo', valor)} disabled={salvando} trackColor={{ false: colors.border, true: colors.primary }} thumbColor={colors.card} ios_backgroundColor={colors.border} />
+                <Switch accessibilityLabel="Serviço ativo" hitSlop={12} value={formulario.ativo} onValueChange={valor => alterarCampo('ativo', valor)} disabled={salvando} trackColor={{ false: colors.border, true: colors.primary }} thumbColor={colors.card} ios_backgroundColor={colors.border} />
               </View>
               {errosCampos.ativo ? <Text accessibilityRole="alert" style={styles.error}>{errosCampos.ativo}</Text> : null}
             </View>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   categoryField: { gap: spacing.sm },
   categoryChips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   categoryChip: { flexBasis: '30%', flexGrow: 1, minWidth: 100 },
-  switchRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm },
+  switchRow: { minHeight: 44, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm },
   label: { color: colors.text, fontSize: 16, flexShrink: 1 },
   error: { color: colors.danger, fontSize: 14 },
   feedback: { flex: 1, width: '100%', maxWidth: 600, alignSelf: 'center', justifyContent: 'center', padding: spacing.lg, gap: spacing.md },

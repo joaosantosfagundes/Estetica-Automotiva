@@ -14,7 +14,7 @@ const iconesPorCategoria = { Exterior: 'water-outline', Pintura: 'sparkles-outli
 function formatarDuracao(minutos) {
   const horas = Math.floor(minutos / 60);
   const restante = minutos % 60;
-  return horas ? horas + 'h' + (restante ? ' ' + restante + 'min' : '') : minutos + 'min';
+  return horas ? horas + ' h' + (restante ? ' ' + restante + ' min' : '') : minutos + ' min';
 }
 
 export default function ServiceDetailScreen({ route, navigation }) {

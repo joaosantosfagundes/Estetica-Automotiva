@@ -12,6 +12,8 @@ export default function Input({ label, value, onChangeText, error, secureTextEnt
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
+        autoCapitalize={secureTextEntry || keyboardType === 'email-address' ? 'none' : undefined}
+        autoCorrect={secureTextEntry || keyboardType === 'email-address' ? false : undefined}
         placeholder={placeholder}
         placeholderTextColor={colors.muted}
         style={[styles.input, Boolean(error) && styles.invalid]}

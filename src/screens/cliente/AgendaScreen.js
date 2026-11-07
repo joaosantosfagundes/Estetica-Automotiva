@@ -68,7 +68,7 @@ export default function AgendaScreen({ navigation }) {
   }
 
   const itens = listas[aba];
-  return <SafeAreaView edges={['bottom']} style={styles.safe}>
+  return <SafeAreaView edges={['top', 'left', 'right']} style={styles.safe}>
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { if (!bloqueio.current) carregar(true); }} tintColor={colors.primary} colors={[colors.primary]} />}>
       <View style={styles.headerRow}>
