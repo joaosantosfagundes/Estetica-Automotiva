@@ -39,14 +39,14 @@ Antes de dar uma tarefa como pronta, confira que o app abre sem erro e rode o li
 
 - JavaScript (sem TypeScript)
 - Firebase Authentication (e-mail/senha) e Realtime Database
-- AsyncStorage, expo-image-picker, expo-notifications
+- AsyncStorage para sessão e último veículo, expo-image-picker para foto local
 - API FIPE (parallelum.com.br/fipe) para marca, modelo e ano
 
 ## Arquitetura em camadas (mesmo padrão do SGM-Marmitaria e do Sistema-Gestao-Consorcios)
 
 Fluxo obrigatório: Screen -> Controller -> Service -> Repository -> Firebase/API.
 - Entity (src/entities): formato do dado, constantes (ex.: STATUS_AGENDAMENTO) e função que monta o objeto a partir do Firebase. Sem acesso a dados.
-- Repository (src/repositories): ÚNICO lugar que importa firebase ou chama API externa (FIPE). Só leitura e escrita, sem regra de negócio.
+- Repository (src/repositories): Único lugar que consulta ou grava dados no Firebase e chama a API FIPE. A inicialização do SDK fica em src/config/firebase.js. Repositórios fazem leitura e escrita, sem regra de negócio.
 - Service (src/services): regras de negócio (horários disponíveis, conflito de agenda, transição de status). Usa repositories e entities. Lança AppError com mensagem em português quando uma regra falha.
 - Controller (src/controllers): ponto de entrada das telas. Valida os dados do formulário, chama os services e devolve o resultado. Erros sobem como AppError para a tela exibir.
 - Screen/Component (src/screens, src/components): só interface e estado local. NUNCA importa repository nem firebase; chama apenas controllers.
@@ -55,28 +55,29 @@ Fluxo obrigatório: Screen -> Controller -> Service -> Repository -> Firebase/AP
 
 ## Estrutura de pastas
 
-src/config        -> firebase.js
-src/contexts      -> AuthContext
-src/entities      -> Usuario, Veiculo, Servico, Agendamento, Configuracao
-src/repositories  -> usuarioRepository, veiculoRepository, servicoRepository, agendamentoRepository, configuracaoRepository, fipeRepository
-src/services      -> authService, veiculoService, servicoService, agendamentoService, agendaService, configuracaoService
-src/controllers   -> authController, veiculoController, servicoController, agendamentoController, agendaController, configuracaoController
-src/navigation    -> AuthStack, ClientNavigator, AdminNavigator, index
-src/screens/auth, src/screens/cliente, src/screens/admin
-src/components    -> Button, Input, Card, Loading
-src/utils         -> schedule.js, validators.js, formatters.js, AppError.js
-src/theme         -> cores e espaçamentos
-database/         -> regras.json (regras do Realtime Database) e seed.json (dados de exemplo)
-scripts/          -> utilitários de desenvolvimento
-docs/             -> modelo-de-dados.md e decisões
+- `index.js` e `App.js` iniciam o app e compõem sessão e navegação.
+- `src/config/firebase.js` inicializa Authentication, persistência e Realtime Database.
+- `src/contexts/AuthContext.js` acompanha a sessão autenticada.
+- `src/navigation/` contém `index.js`, `AuthStack.js`, `ClientNavigator.js` e `AdminNavigator.js`.
+- `src/screens/auth/` contém Login e Cadastro. `src/screens/cliente/` contém Home, catálogo, detalhes de serviço, garagem, cadastro de veículo e agenda. `src/screens/admin/` contém agenda, detalhe da reserva, gestão de serviços e funcionamento. `src/screens/ProfileScreen.js` é compartilhada.
+- `src/controllers/` expõe autenticação, serviços, veículos, configuração, agendamento do cliente e agenda admin.
+- `src/services/` concentra `authService`, `veiculoService`, `servicoService`, `agendamentoService`, `agendaService`, `configuracaoService` e `fipeService`.
+- `src/repositories/` acessa usuários, veículos, serviços, reservas e configuração no Firebase. `fipeRepository.js` consulta marca, modelo e ano.
+- `src/entities/` reúne `Usuario`, `Veiculo`, `Servico`, `Agendamento` e `Configuracao`.
+- `src/components/` contém `Button`, `Input`, `Card`, `Loading`, `EmptyState` e `Select`. `src/theme/` define cores, espaçamentos e raios.
+- `src/utils/` contém `schedule.js`, `validators.js`, `formatters.js`, `preferencias.js` e `AppError.js`.
+- `database/regras.json` define as regras do Realtime Database. `scripts/testSchedule.mjs` testa disponibilidade.
+- `assets/` contém os ícones do app. `docs/` contém o modelo de dados, as instruções de segurança e os materiais de design.
 
 ## Modelo de dados (Realtime Database)
 
-users/{uid}: nome, telefone, email, role ("cliente" | "admin")
-vehicles/{id}: userId, marca, modelo, ano, placa, fotoUri
-services/{id}: nome, descricao, categoria (string), preco (number, reais), duracaoMin (number), ativo (boolean)
-bookings/{id}: userId, vehicleId, serviceId, data ("YYYY-MM-DD"), horaInicio ("HH:mm"), horaFim ("HH:mm"), status ("pendente" | "confirmado" | "cancelado" | "concluido"), criadoEm
-settings/horario: abertura ("HH:mm"), fechamento ("HH:mm"), diasFuncionamento (array de 0 a 6)
+- `users/{uid}` contém `nome`, `telefone`, `email` e `role` (`cliente` ou `admin`). O UID vem do Firebase Authentication.
+- `vehicles/{id}` contém `userId`, `marca`, `modelo`, `ano`, `placa` e `fotoUri`. O app grava o ano como número e a foto como URI do aparelho. A consulta do cliente usa o índice `userId`.
+- `services/{id}` contém `nome`, `descricao`, `categoria`, `preco` em reais, `duracaoMin` e `ativo`. As categorias do app são Exterior, Pintura, Interior, Proteção e Outros. Serviços legados sem categoria aparecem em Outros.
+- `bookings/{id}` contém `userId`, `vehicleId`, `serviceId`, `data` (`YYYY-MM-DD`), `horaInicio` e `horaFim` (`HH:mm`), `status` (`pendente`, `confirmado`, `cancelado` ou `concluido`) e `criadoEm` em milissegundos. Os índices são `data` e `userId`. O cancelamento do cliente escreve apenas o campo `status`.
+- `settings/horario` contém `abertura`, `fechamento` e `diasFuncionamento`, de 0 (domingo) a 6 (sábado). O padrão é 08:00–18:00 de segunda a sábado.
+
+As entidades expõem os IDs pelas chaves dos registros. Os campos, os dados legados e as permissões estão no [modelo de dados](docs/modelo-de-dados.md).
 
 ## Regra de negócio central
 
