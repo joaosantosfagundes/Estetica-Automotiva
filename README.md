@@ -108,28 +108,6 @@ Para conferir as permissões, simule com o UID de um cliente a escrita de `admin
 | Responsividade e acessibilidade | [Home](src/screens/cliente/HomeScreen.js), [garagem](src/screens/cliente/VehiclesScreen.js) e [botões compartilhados](src/components/Button.js). |
 | Código em camadas | [Tela de agendar](src/screens/cliente/AgendarScreen.js) → [controller](src/controllers/agendamentoController.js) → [service](src/services/agendamentoService.js) → [repository](src/repositories/agendamentoRepository.js). |
 
-## Conferência antes da entrega
-
-- [ ] Verificar no console a publicação das regras e a negação da tentativa de elevação de perfil pelo cliente.
-- [ ] Preparar uma conta admin e duas contas cliente com dados fictícios. Confirmar que João e Breno têm o acesso necessário ao projeto Firebase compartilhado.
-- [ ] Abrir o app no Expo Go a partir de um clone limpo e de um `.env` preenchido localmente.
-- [ ] Agendar como cliente, confirmar como admin, voltar à conta cliente e conferir **Confirmado**. Cancelar a reserva futura, conferir o **Histórico** e atualizar a agenda do admin para ver **Cancelado** e o horário liberado.
-- [ ] Conferir que o vídeo usa dados de teste e que o `.env` está fora dos arquivos versionados.
-
-### Roteiro de demonstração em até três minutos
-
-| Tempo | Demonstração |
-| --- | --- |
-| 0:00–0:15 | Apresentar a dupla, o problema e os dois perfis. |
-| 0:15–0:45 | Mostrar uma validação de cadastro, entrar e abrir o catálogo. |
-| 0:45–1:15 | Cadastrar veículo com a FIPE e selecionar a foto. |
-| 1:15–1:55 | Escolher serviço, veículo, data e horário e confirmar a reserva. |
-| 1:55–2:30 | Abrir o dia como admin, confirmar a reserva e mostrar o formulário de serviço. |
-| 2:30–2:45 | Voltar como cliente, conferir a confirmação e cancelar uma reserva futura. |
-| 2:45–3:00 | Mostrar as camadas, o Firebase e a integração FIPE. |
-
-Com a `main` integrada e a conferência concluída, marque o commit aprovado com `git tag v1.0` e publique a tag com `git push origin v1.0`.
-
 ## Limitações e próximos passos
 
 - A disponibilidade é revalidada antes da gravação. A consulta e a escrita são operações separadas, então reservas concorrentes ainda podem ocupar o mesmo horário. Uma operação transacional no servidor pode garantir a exclusividade.
